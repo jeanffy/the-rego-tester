@@ -1,0 +1,24 @@
+{
+  "source": {
+    "rego": "tests/example-rule.rego",
+    "data": "tests/example-rule.data.json",
+    "package": "example.opa"
+  },
+  "entryPoints": [
+    {
+      "var": "allowed",
+      "tests": [
+        { "name": "alice is allowed",  "input": { "userName": "alice" }, "expected": true },
+        { "name": "bob is not allowed",  "input": { "userName": "bob" }, "expected": false }
+      ]
+    },
+    {
+      "var": "state",
+      "tests": [
+        { "name": "state is inactive",  "input": { "numberOfVisits": 1 }, "expected": "inactive" },
+        { "name": "state is active",  "input": { "numberOfVisits": 6 }, "expected": "active" },
+        { "name": "state is super-active",  "input": { "numberOfVisits": 101 }, "expected": "super-active" }
+      ]
+    }
+  ]
+}
