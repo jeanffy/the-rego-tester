@@ -3,7 +3,8 @@ package usecases
 import (
 	"encoding/json"
 	"fmt"
-	"theregotester/internal/domain/ports"
+	"regotest/internal/domain/ports"
+	"regotest/internal/infra/colors"
 )
 
 // ---------------------------------------------------------------------------
@@ -44,18 +45,26 @@ type RunTestUseCaseExecuteParams struct {
 }
 
 func (x *RunTestUseCase) Execute(params RunTestUseCaseExecuteParams) bool {
+	if params.Verbose {
+		fmt.Printf(colors.Dimmed("> Running test '%s'\n"), params.Name)
+	}
+
 	result, err := x.opaPort.Evaluate(ports.OpaPortEvaluateParams{
 		RegoPath:   params.RegoPath,
 		DataPath:   params.DataPath,
 		EntryPoint: params.EntryPoint,
 		Input:      params.Input,
+		Verbose:    params.Verbose,
 	})
+
+	if params.Verbose {
+		fmt.Printf(colors.Dimmed("> Test output:\n"))
+		fmt.Printf(colors.Dimmed("%s\n"), result.Output)
+	}
+
 	if err != nil {
 		fmt.Printf("❌ [KO] %s\n", params.Name)
 		fmt.Printf("evaluate error: %v\n", err)
-		if params.Verbose {
-			fmt.Printf("\x1b[2m%s\x1b[0m\n", result.Output)
-		}
 		return false
 	}
 
@@ -63,16 +72,10 @@ func (x *RunTestUseCase) Execute(params RunTestUseCaseExecuteParams) bool {
 		fmt.Printf("❌ [KO] %s\n", params.Name)
 		fmt.Printf("expected: %v\n", params.Expected)
 		fmt.Printf("actual: %v\n", result.Value)
-		if params.Verbose {
-			fmt.Printf("\x1b[2m%s\x1b[0m\n", result.Output)
-		}
 		return false
 	}
 
 	fmt.Printf("✅ [OK] %s\n", params.Name)
-	if params.Verbose {
-		fmt.Printf("\x1b[2m%s\x1b[0m\n", result.Output)
-	}
 
 	return true
 }

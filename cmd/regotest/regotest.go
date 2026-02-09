@@ -5,10 +5,10 @@ import (
 	"flag"
 	"fmt"
 	"os"
-	"theregotester/internal/domain/ports"
-	"theregotester/internal/domain/usecases"
-	"theregotester/internal/infra/adapters"
-	"theregotester/pkg/di"
+	"regotest/internal/domain/ports"
+	"regotest/internal/domain/usecases"
+	"regotest/internal/infra/adapters"
+	"regotest/pkg/di"
 )
 
 // #region Test suite
@@ -37,7 +37,7 @@ type Test struct {
 
 // #endregion Test suite
 
-var VERSION = "0.0.1"
+var VERSION = "0.0.2"
 
 func main() {
 	fmt.Printf("RegoTest v%s\n", VERSION)
@@ -59,13 +59,13 @@ func main() {
 
 	testSuiteContent, err := os.ReadFile(testSuitePath)
 	if err != nil {
-		fmt.Printf("read %s error: %v", testSuitePath, err)
+		fmt.Printf("read %s error: %v\n", testSuitePath, err)
 		return
 	}
 
 	var testSuite TestSuite
 	if err := json.Unmarshal(testSuiteContent, &testSuite); err != nil {
-		fmt.Printf("could not marshal json: %v", err)
+		fmt.Printf("could not marshal json: %v\n", err)
 		return
 	}
 

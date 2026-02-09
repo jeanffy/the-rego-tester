@@ -9,9 +9,10 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"regotest/internal/domain/ports"
+	"regotest/internal/infra/colors"
 	"runtime"
 	"strings"
-	"theregotester/internal/domain/ports"
 )
 
 // ---------------------------------------------------------------------------
@@ -91,12 +92,18 @@ func (x *BinaryOpaAdapter) Evaluate(params ports.OpaPortEvaluateParams) (ports.O
 		return ports.OpaPortEvaluateResult{}, fmt.Errorf("error marshal input: %w", err)
 	}
 
+	if params.Verbose {
+		fmt.Printf(colors.Dimmed("OPA call:\n"))
+		fmt.Printf(colors.Dimmed(" - %s %v\n"), x.opaExePath, args)
+		fmt.Printf(colors.Dimmed(" - Input: %s\n"), string(params.Input))
+	}
+
 	cmd := exec.Command(x.opaExePath, args...)
 	cmd.Stdin = bytes.NewReader(inputBytes)
 
 	out, err := cmd.CombinedOutput()
 	if err != nil {
-		return ports.OpaPortEvaluateResult{}, fmt.Errorf("opa failed: %v\n", err)
+		return ports.OpaPortEvaluateResult{}, fmt.Errorf(colors.Error("opa failed: %v\n%s\n"), err, out)
 	}
 
 	responseStr, err := extractLastObject(string(out))
@@ -106,17 +113,17 @@ func (x *BinaryOpaAdapter) Evaluate(params ports.OpaPortEvaluateParams) (ports.O
 
 	var response OpaResponse
 	if err := json.Unmarshal([]byte(responseStr), &response); err != nil {
-		return ports.OpaPortEvaluateResult{}, fmt.Errorf("invalid json: %w\n", err)
+		return ports.OpaPortEvaluateResult{}, fmt.Errorf(colors.Error("invalid json: %w\n"), err)
 	}
 
 	if len(response.Results) == 0 {
-		return ports.OpaPortEvaluateResult{}, fmt.Errorf("no result in response\n")
+		return ports.OpaPortEvaluateResult{}, fmt.Errorf(colors.Error("no result in response\n"))
 	}
 
 	result := response.Results[0]
 
 	if len(result.Expressions) == 0 {
-		return ports.OpaPortEvaluateResult{}, fmt.Errorf("no expression in result\n")
+		return ports.OpaPortEvaluateResult{}, fmt.Errorf(colors.Error("no expression in result\n"))
 	}
 
 	expression := result.Expressions[0]

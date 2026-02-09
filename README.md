@@ -32,12 +32,12 @@ Test suite JSON file:
 ## Run
 
 ```sh
-regotest [--verbose] [--bail] [--only "name"] /path/to/test-suite.json
+regotest [-verbose] [-bail] [-only "name"] /path/to/test-suite.json
 ```
 
 - `-verbose`: enable verbose mode
-- `--bail`: exit immediately if a test case fails (don't run subsequent test cases)
-- `--only "name"`: run only the test case named "name"
+- `-bail`: exit immediately if a test case fails (don't run subsequent test cases)
+- `-only "name"`: run only the test case named "name"
 
 ## Build
 

@@ -1,12 +1,15 @@
 package ports
 
+import "encoding/json"
+
 var OPA_PORT_TOKEN = "OpaPort"
 
 type OpaPortEvaluateParams struct {
 	RegoPath   string
 	DataPath   string
 	EntryPoint string
-	Input      interface{}
+	Input      json.RawMessage
+	Verbose    bool
 }
 
 type OpaPortEvaluateResult struct {
